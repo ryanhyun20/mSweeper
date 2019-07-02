@@ -4,7 +4,24 @@
 using namespace std;
 
 static int maxDim = 30;
-void setUpGame(string[][maxDim] grid) {
+
+struct tile {
+    int x_value;
+    int y_value;
+    string tile_value;
+    bool found;
+    bool hit;
+}
+
+void initGrid(string[][maxDim] grid) {
+  for(int i = 0; i < maxDim; i++) {
+      for(int j = 0; j < maxDim; j++) {
+          grid[i][j] = "0";
+      }
+  }
+}
+
+void setUpGrid(string[][maxDim] grid) {
   vector<string> placedMines;
   while(true) {
     //randomly generate seeds
@@ -26,6 +43,7 @@ void setUpGame(string[][maxDim] grid) {
           if(i == x && j == y) {
             grid[i][j] = "X";
           } else if(i > -1 && i < maxDim && j > -1 && j < maxDim) {
+            if(grid[i][j]
             grid[i][j] = std::to_string(stoi(grid[i][j]) + 1);
           }
         }
@@ -34,11 +52,30 @@ void setUpGame(string[][maxDim] grid) {
   }
 }
 
+void moveCursor(int x, int y, string dir) {
+
+}
+
+void dig(int x, int y, string act) {
+  if(act.compare("f") == 0) {
+
+  }
+}
+
+void flag(int x, int y) {
+
+}
+
 int main()
 {
-  setUpGame();
+  string grid[maxDim][maxDim];
+  initGrid(grid);
+  setUpGrid(grid);
+  //game loop
   while(true) {
     //print game state
+    printGrid(grid);
     //wait for stuff
+    while()
   }
 }
