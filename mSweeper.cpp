@@ -15,7 +15,7 @@ struct myCursor {
   int y;
 } ;
 
-const int maxDim = 30;
+const int maxDim = 20;
 bool gameOver = false;
 
 myTile theGrid[maxDim][maxDim];
@@ -27,23 +27,23 @@ void initGame(void)
   theCursor.y = 0;
   for(int i = 0; i < maxDim; i++) {
     for(int j = 0; j < maxDim; j++) {
-      theGrid[i][j].tile_value = "0";
+      theGrid[j][i].tile_value = "0";
     }
   }
 }
 
 void setUpGrid(void)
 {
-  string placedMines[maxDim];
-  int numMines = maxDim;
+  string placedMines[maxDim * maxDim/4];
+  int numMines = maxDim * maxDim/4;
   int mineNo = 0;
   while(true) {
     //randomly generate seeds
-    int x = rand() % 30;
-    int y = rand() % 30;
+    int x = rand() % maxDim;
+    int y = rand() % maxDim;
     string potentialMine = std::to_string(x) + ", " + std::to_string(y);
     bool place = true;
-    for(int i = 0; i < maxDim/3; i++) {
+    for(int i = 0; i < maxDim/2; i++) {
       if(placedMines[i].compare(potentialMine) == 0) {
         place = false;
       }
@@ -52,17 +52,17 @@ void setUpGrid(void)
       placedMines[mineNo] = potentialMine;
       mineNo++;
       theGrid[x][y].tile_value = "X";
-      for(int i = x - 1; i < x + 2; i++) {
-        for(int j = y - 1; j < y + 2; j++) {
-          if(i == x && j == y) {
-            theGrid[i][j].tile_value = "X";
+      for(int i = y - 1; i < y + 2; i++) {
+        for(int j = x - 1; j < x + 2; j++) {
+          if(i == y && j == x) {
+            theGrid[j][i].tile_value = "X";
           } else if(i > -1 && i < maxDim && j > -1 && j < maxDim &&
-                    theGrid[i][j].tile_value.compare("X") != 0) {
-            theGrid[i][j].tile_value = std::to_string(stoi(theGrid[i][j].tile_value) + 1);
+                    theGrid[j][i].tile_value.compare("X") != 0) {
+            theGrid[j][i].tile_value = std::to_string(stoi(theGrid[j][i].tile_value) + 1);
           }
         }
       }
-      if(numMines == mineNo) {
+      if(mineNo >= numMines) {
         break;
       }
     }
@@ -72,12 +72,12 @@ void setUpGrid(void)
 void moveCursor(string key)
 {
   if(key.compare("k") == 0) {
-    if(theCursor.y > 0) {
-      theCursor.y--;
-    }
-  } else if(key.compare("i") == 0) {
     if(theCursor.y < maxDim - 1) {
       theCursor.y++;
+    }
+  } else if(key.compare("i") == 0) {
+    if(theCursor.y > 0) {
+      theCursor.y--;
     }
   } else if(key.compare("j") == 0) {
     if(theCursor.x > 0) {
@@ -96,7 +96,7 @@ bool isComplete(int x, int y)
   for(int i = x - 1; i < x + 2; i++) {
     for(int j = y - 1; j < y + 2; j++) {
       if(i > -1 && i < maxDim && j > -1 && j < maxDim) {
-        if(theGrid[i][j].flag) {
+        if(theGrid[j][i].flag) {
           flags++;
         }
       }
@@ -111,24 +111,27 @@ bool isComplete(int x, int y)
 void dig(int x, int y, int depth)
 {
   if(!theGrid[x][y].flag) {
-    if(theGrid[x][y].tile_value.compare("0") == 0) {
-      for(int i = x - 1; i < x + 2; i++) {
-        for(int j = y - 1; j < y + 2; j++) {
-          if(i > -1 && i < maxDim && j > -1 && j < maxDim) {
-            dig(i, j, depth);
+    if(theGrid[x][y].tile_value.compare("X") == 0) {
+      //end game
+      gameOver = true;
+    } else if(!theGrid[x][y].hit) {
+      theGrid[x][y].hit = true;
+      if(theGrid[x][y].tile_value.compare("0") == 0) {
+        for(int i = y - 1; i < y + 2; i++) {
+          for(int j = x - 1; j < x + 2; j++) {
+            if(i > -1 && i < maxDim && j > -1 && j < maxDim) {
+              dig(j, i, depth);
+            }
           }
         }
       }
-    } else if(theGrid[x][y].tile_value.compare("X") == 0) {
-        //end game
-        gameOver = true;
-    } else if(!theGrid[x][y].hit) {
-      theGrid[x][y].hit = true;
-    } else if(isComplete(x, y) && depth == 0){
-      for(int i = x - 1; i < x + 2; i++) {
-        for(int j = y - 1; j < y + 2; j++) {
-          if(i > -1 && i < maxDim && j > -1 && j < maxDim) {
-            dig(i, j, 1);
+    } else if(theGrid[x][y].hit) {
+      if(isComplete(x, y) && depth == 0){
+        for(int i = y - 1; i < y + 2; i++) {
+          for(int j = x - 1; j < x + 2; j++) {
+            if(i > -1 && i < maxDim && j > -1 && j < maxDim) {
+              dig(j, i, 1);
+            }
           }
         }
       }
@@ -138,7 +141,13 @@ void dig(int x, int y, int depth)
 
 void flag(int x, int y)
 {
-  theGrid[x][y].flag = true;
+  if(!theGrid[x][y].hit) {
+    if(theGrid[x][y].flag) {
+      theGrid[x][y].flag = false;
+    } else {
+      theGrid[x][y].flag = true;
+    }
+  }
 }
 
 void printGrid(void)
@@ -151,10 +160,12 @@ void printGrid(void)
   for(int i = 0; i < maxDim; i++) {
     cout << "|";
     for(int j = 0; j < maxDim; j++) {
-      if(theGrid[i][j].flag) {
+      if(theCursor.y == i && theCursor.x == j) {
+        cout << "C" << "|";
+      } else if(theGrid[j][i].flag) {
         cout << "F" << "|";
-      } else if(theGrid[i][j].tile_value.compare("0") != 0) {
-        cout << theGrid[i][j].tile_value; << "|";
+      } else if(theGrid[j][i].hit) {
+        cout << theGrid[j][i].tile_value << "|";
       } else {
         cout << " " << "|";
       }
@@ -180,7 +191,7 @@ void isGameOver(void)
   int signals = 0;
   for(int i = 0; i < maxDim; i++) {
     for(int j = 0; j < maxDim; j++) {
-      if(!theGrid[i][j].hit && theGrid[i][j].tile_value.compare("X") != 0) {
+      if(!theGrid[j][i].hit && theGrid[j][i].tile_value.compare("X") != 0) {
         signals++;
       }
     }
@@ -199,11 +210,7 @@ void printEndGrid(void) {
   for(int i = 0; i < maxDim; i++) {
     cout << "|";
     for(int j = 0; j < maxDim; j++) {
-      if(theGrid[i][j].tile_value.compare("X") == 0) {
-        cout << theGrid[i][j].tile_value << "|";
-      } else {
-        cout << " " << "|";
-      }
+      cout << theGrid[j][i].tile_value << "|";
     }
     cout << "\n";
     if(i != maxDim - 1) {
@@ -234,7 +241,7 @@ int main()
     if(key.compare("i") == 0 || key.compare("j") == 0 || key.compare("k") == 0
         ||key.compare("l") == 0) {
       moveCursor(key);
-      printEndGrid();
+      printGrid();
     } else if(key.compare("d") == 0){
       dig(theCursor.x, theCursor.y, 0);
       printGrid();
