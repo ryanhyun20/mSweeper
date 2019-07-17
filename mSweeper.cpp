@@ -1,8 +1,15 @@
+/*
+* mSweeper: This file holds the source code for a simple, printing-based
+* implementation of the classic game, Minesweeper.
+*/
+
 #include <iostream>
 #include <cstdlib>
 #include <cstdio>
+#include <time.h>
 using namespace std;
 
+// struct to hold information regarding the squares in the game grid
 struct myTile {
   string tile_value;
   bool hit;
@@ -10,6 +17,7 @@ struct myTile {
   bool mystery;
 } ;
 
+// struct to hold cursor information
 struct myCursor {
   int x;
   int y;
@@ -37,6 +45,7 @@ void setUpGrid(void)
   string placedMines[maxDim * maxDim/4];
   int numMines = maxDim * maxDim/4;
   int mineNo = 0;
+  srand(time(NULL));
   while(true) {
     //randomly generate seeds
     int x = rand() % maxDim;
@@ -93,8 +102,8 @@ void moveCursor(string key)
 bool isComplete(int x, int y)
 {
   int flags = 0;
-  for(int i = x - 1; i < x + 2; i++) {
-    for(int j = y - 1; j < y + 2; j++) {
+  for(int i = y - 1; i < y + 2; i++) {
+    for(int j = x - 1; j < x + 2; j++) {
       if(i > -1 && i < maxDim && j > -1 && j < maxDim) {
         if(theGrid[j][i].flag) {
           flags++;
