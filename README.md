@@ -1,4 +1,4 @@
 # mSweeper
-To make, use `make`.
+To build, run `make`.
 
-To clean, `make clean`.
+To clean, run `make clean`.
