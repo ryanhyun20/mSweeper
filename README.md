@@ -1,2 +1,4 @@
 # mSweeper
-simple Mine Sweeper implementation
+To make, use `make`.
+
+To clean, `make clean`.
