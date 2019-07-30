@@ -52,6 +52,17 @@ updating tiles adjacent to mines with values of the count of adjacent tiles with
   4. interpret the input
 5. print a gameover message
 
-## Dataflow through Modules
-1. `main` parses arguments and calls functions to set up, start and finish the game
-2. 
+## Major Data Structures
+1. Tile, which holds a string value and booleans for whether it has been hit, flagged, or mystery-flagged
+2. 2-D Array of tile structs
+3. Cursor, which is used in a global context to hold x- and y-coordinates
+
+## Error Handling
+1. No non-zero exit status
+2. Handle input errors through corrective prompts
+
+## Testing
+1. Run the game through the command-line
+2. Test `dig` and `flag` by repeatedly calling those functions on single tiles
+  1. Call `dig` on a flagged tile
+  2. Call `flag` on a
