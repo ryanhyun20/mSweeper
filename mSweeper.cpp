@@ -296,7 +296,7 @@ void printEndGrid(void) {
     cout << "|";
     for(int j = 0; j < maxDim; j++) {
       if(theGrid[j][i].flag) {
-        if (theGrid[j][i].tile_value.compare("X") == 0) {
+        if(theGrid[j][i].tile_value.compare("X") == 0) {
           // correctly placed flag
           cout << "F|";
         } else {
